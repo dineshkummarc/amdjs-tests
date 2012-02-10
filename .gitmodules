@@ -1,0 +1,3 @@
+[submodule "impl/steal"]
+	path = impl/steal
+	url = https://github.com/jupiterjs/steal

@@ -7,14 +7,23 @@
         dohPath = location.href,
         pathRegExp = /\.\.|:|\/\//,
         html = '',
-        i, part;
+        i, part, multi, key;
 
     args = {};
 
     //Build up the args from querystring parts.
-    for (i = 0; (part = parts[i]); i++) {
-        part = part.split('=');
-        args[decodeURIComponent(part[0])] = decodeURIComponent(part[1]);
+    for ( i = 0; (part = parts[i]); i++ ) {
+		if ( part.indexOf("[]=") > -1 ) {
+			multi = part.split("[]=");
+			key = decodeURIComponent( multi[0] );
+			if ( ! args[ key ] ) {
+				args[ key ] = [];
+			}
+			args[ key ].push( decodeURIComponent( multi[1] ));
+		} else {
+			part = part.split('=');
+			args[decodeURIComponent(part[0])] = decodeURIComponent(part[1]);
+		}
     }
 
     //Set up dohPath
@@ -33,7 +42,13 @@
         return;
     }
 
-    write('../../impl/' + args.impl);
+	if ( args.impl.constructor == Array ) {
+		for ( i = 0; i < args.impl.length; i++ ) {
+			write('../../impl/' + args.impl[i] );
+		}
+	} else {
+		write('../../impl/' + args.impl);
+	}
     write('../../impl/' + args.config);
 
     if (location.href.indexOf('doh/runner.html') === -1) {
